@@ -1,0 +1,21 @@
+*.iml
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+/.idea/navEditor.xml
+/.idea/assetWizardSettings.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+/.idea/gradle.xml          # Android Studio的Gradle配置
+/.idea/misc.xml            # 其他IDE杂项配置
+/.idea/vcs.xml             # 版本控制配置
+*.apk                      # 避免误传构建好的安装包
+*.aar                      # 避免误传打包的库文件
+*.zip                      # 临时压缩包

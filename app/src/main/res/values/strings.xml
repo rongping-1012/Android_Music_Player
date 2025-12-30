@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Music_Player</string>
+    <string name="player_name">用户名</string>
+    <string name="Player_password">密码</string>
+    <string name="Log_in">登录</string>
+    <string name="Player_register">注册</string>
+    <string name="change_password">修改密码</string>
+    <string name="old_password">原密码</string>
+    <string name="new_password">新密码</string>
+    <string name="confirm_new_password">确认新密码</string>
+</resources>
