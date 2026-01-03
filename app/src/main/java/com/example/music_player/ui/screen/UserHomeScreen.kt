@@ -37,8 +37,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
-import com.example.music_player.data.MusicFile
+import com.example.music_player.data.model.MusicFile
 import com.example.music_player.navigation.Screen
+import com.example.music_player.ui.component.BannerCarousel
 import com.example.music_player.ui.component.BottomPlayerBar
 import com.example.music_player.ui.component.ScrollingTitle
 import com.example.music_player.ui.viewmodel.MusicListUiState
@@ -46,7 +47,11 @@ import com.example.music_player.ui.viewmodel.UserViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UserHomeScreen(navController: NavController, viewModel: UserViewModel) {
+fun UserHomeScreen(
+    @Suppress("UNUSED_PARAMETER") navController: NavController, 
+    viewModel: UserViewModel
+) {
+    // navController 保留用于未来导航功能，当前未使用
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val currentSong by viewModel.currentSong.collectAsStateWithLifecycle()
     val searchQuery by viewModel.searchQuery.collectAsStateWithLifecycle()
@@ -235,7 +240,7 @@ fun UserHomeScreen(navController: NavController, viewModel: UserViewModel) {
 fun SearchBar(
     query: String,
     onQueryChange: (String) -> Unit,
-    onSearchActiveChange: (Boolean) -> Unit,
+    @Suppress("UNUSED_PARAMETER") onSearchActiveChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
     // onSearchActiveChange 保留用于未来扩展
@@ -290,11 +295,42 @@ fun MusicList(
 ) {
     val favoriteMap by viewModel.favoriteMap.collectAsStateWithLifecycle()
     
+    // 轮播图数据（通过 Retrofit 获取，当前使用本地数据模拟）
+    val bannersState by viewModel.banners.collectAsStateWithLifecycle()
+    
+    LaunchedEffect(Unit) {
+        viewModel.loadBanners()
+    }
+    
+    // 将 BannerData 转换为 BannerItem
+    val banners = remember(bannersState) {
+        bannersState.map { bannerData ->
+            com.example.music_player.ui.component.BannerItem(
+                id = bannerData.id,
+                title = bannerData.title,
+                imageUrl = bannerData.imageUrl,
+                linkUrl = bannerData.linkUrl
+            )
+        }
+    }
+    
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
+        // 轮播图
+        item {
+            BannerCarousel(
+                banners = banners,
+                modifier = Modifier.padding(bottom = 16.dp),
+                onBannerClick = { banner ->
+                    // 处理轮播图点击事件
+                    android.util.Log.d("BannerCarousel", "Clicked banner: ${banner.title}")
+                }
+            )
+        }
+        
         itemsIndexed(musicFiles) { index, musicFile ->
             val isFavorite = favoriteMap[musicFile.uri.toString()] == true
             MusicItem(

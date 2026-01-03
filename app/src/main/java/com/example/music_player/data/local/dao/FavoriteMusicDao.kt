@@ -1,9 +1,10 @@
-package com.example.music_player.data
+package com.example.music_player.data.local.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Delete
+import com.example.music_player.data.local.entity.FavoriteMusic
 
 @Dao
 interface FavoriteMusicDao {

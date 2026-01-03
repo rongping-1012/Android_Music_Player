@@ -3,7 +3,7 @@ package com.example.music_player.ui.viewmodel
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.music_player.data.UserRepository
+import com.example.music_player.data.repository.UserRepository
 import com.example.music_player.data.UserService
 import com.example.music_player.service.MusicServiceConnection
 

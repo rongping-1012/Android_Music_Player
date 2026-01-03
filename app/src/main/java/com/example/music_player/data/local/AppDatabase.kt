@@ -1,4 +1,4 @@
-package com.example.music_player.data
+package com.example.music_player.data.local
 
 import android.content.Context
 import androidx.room.Database
@@ -8,6 +8,12 @@ import androidx.room.TypeConverter
 import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.example.music_player.data.local.dao.FavoriteMusicDao
+import com.example.music_player.data.local.dao.PlayHistoryDao
+import com.example.music_player.data.local.entity.FavoriteMusic
+import com.example.music_player.data.local.entity.PlayHistory
+import com.example.music_player.data.local.entity.User
+import com.example.music_player.data.model.Gender
 import java.util.Date
 
 @Database(
@@ -17,7 +23,7 @@ import java.util.Date
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
-    abstract fun userDao(): UserDao
+    abstract fun userDao(): com.example.music_player.data.local.dao.UserDao
     abstract fun playHistoryDao(): PlayHistoryDao
     abstract fun favoriteMusicDao(): FavoriteMusicDao
 
@@ -116,3 +122,4 @@ class Converters {
         return Gender.valueOf(value)
     }
 }
+

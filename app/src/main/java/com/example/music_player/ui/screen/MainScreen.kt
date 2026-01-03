@@ -15,6 +15,9 @@ import androidx.navigation.NavController
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.compose.runtime.DisposableEffect
+import androidx.activity.compose.BackHandler
+import androidx.compose.ui.platform.LocalContext
+import android.widget.Toast
 import com.example.music_player.navigation.Screen
 import com.example.music_player.ui.component.BottomPlayerBar
 import com.example.music_player.ui.theme.ActiveColor
@@ -55,6 +58,27 @@ fun MainScreen(
     }
     val isPlaying by userViewModel.isPlaying.collectAsStateWithLifecycle()
     val currentSong by userViewModel.currentSong.collectAsStateWithLifecycle()
+    
+    // 两次返回退出程序功能
+    val context = LocalContext.current
+    var backPressTime by remember { mutableLongStateOf(0L) }
+    val EXIT_INTERVAL = 2000L // 2秒
+    
+    // 检查是否在主页面（没有子页面打开）
+    val isAtMainScreen = currentRoute == Screen.Main.route
+    
+    // 处理返回键事件
+    BackHandler(enabled = isAtMainScreen) {
+        val currentTime = System.currentTimeMillis()
+        if (currentTime - backPressTime > EXIT_INTERVAL) {
+            // 第一次按返回键，显示提示
+            backPressTime = currentTime
+            Toast.makeText(context, "再按一次退出程序", Toast.LENGTH_SHORT).show()
+        } else {
+            // 2秒内再次按返回键，退出程序
+            (context as? androidx.activity.ComponentActivity)?.finish()
+        }
+    }
 
     Scaffold(
         bottomBar = {

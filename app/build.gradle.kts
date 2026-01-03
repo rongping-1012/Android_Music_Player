@@ -66,6 +66,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
     implementation("androidx.compose.material:material-icons-extended")
+    implementation("androidx.compose.foundation:foundation") // 用于HorizontalPager
 
     // ViewModel & Navigation
     implementation(libs.androidx.lifecycle.viewmodel.compose)
@@ -84,6 +85,11 @@ dependencies {
 
     // Coil (用于图片加载)
     implementation("io.coil-kt:coil-compose:2.5.0")
+
+    // Retrofit (网络请求)
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 
     // Firebase (保留)
     implementation(libs.firebase.firestore.ktx)

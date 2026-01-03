@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.music_player.data.DataStoreManager
-import com.example.music_player.data.MusicRepository
+import com.example.music_player.data.repository.MusicRepository
 import com.example.music_player.data.UserService
 import com.example.music_player.service.MusicServiceConnection
 

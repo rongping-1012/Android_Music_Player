@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.music_player.data.DataStoreManager
-import com.example.music_player.data.User
-import com.example.music_player.data.UserRepository
+import com.example.music_player.data.local.entity.User
+import com.example.music_player.data.repository.UserRepository
 import com.example.music_player.data.UserService
 import com.example.music_player.service.MusicServiceConnection
 import kotlinx.coroutines.flow.MutableStateFlow

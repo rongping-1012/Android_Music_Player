@@ -40,7 +40,7 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import coil.request.ImageRequest
 import androidx.compose.ui.res.painterResource
-import com.example.music_player.data.PlayHistory
+import com.example.music_player.data.local.entity.PlayHistory
 import com.example.music_player.navigation.Screen
 import com.example.music_player.ui.viewmodel.ProfileUiState
 import com.example.music_player.ui.viewmodel.ProfileViewModel
@@ -149,7 +149,7 @@ fun ProfileScreen(navController: NavController, viewModel: ProfileViewModel, dar
                                 )
                             } else {
                                 // 根据性别显示默认头像
-                                val defaultAvatarRes = if (user.gender == com.example.music_player.data.Gender.MALE) {
+                                val defaultAvatarRes = if (user.gender == com.example.music_player.data.model.Gender.MALE) {
                                     com.example.music_player.R.drawable.default_man
                                 } else {
                                     com.example.music_player.R.drawable.default_woman
@@ -185,7 +185,7 @@ fun ProfileScreen(navController: NavController, viewModel: ProfileViewModel, dar
                             Spacer(modifier = Modifier.width(4.dp))
                             androidx.compose.foundation.Image(
                                 painter = painterResource(
-                                    id = if (user.gender == com.example.music_player.data.Gender.MALE) {
+                                    id = if (user.gender == com.example.music_player.data.model.Gender.MALE) {
                                         com.example.music_player.R.drawable.male
                                     } else {
                                         com.example.music_player.R.drawable.female
@@ -414,8 +414,8 @@ fun EditNicknameDialog(viewModel: ProfileViewModel, onDismiss: () -> Unit) {
     val currentUser = (profileState as? ProfileUiState.Success)?.user
     
     var newNickname by remember { mutableStateOf(currentUser?.nickname ?: "") }
-    var selectedGender by remember { mutableStateOf(currentUser?.gender ?: com.example.music_player.data.Gender.MALE) }
-    var pendingGenderUpdate by remember { mutableStateOf<com.example.music_player.data.Gender?>(null) }
+    var selectedGender by remember { mutableStateOf(currentUser?.gender ?: com.example.music_player.data.model.Gender.MALE) }
+    var pendingGenderUpdate by remember { mutableStateOf<com.example.music_player.data.model.Gender?>(null) }
     val updateState by viewModel.updateNicknameState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
@@ -476,13 +476,13 @@ fun EditNicknameDialog(viewModel: ProfileViewModel, onDismiss: () -> Unit) {
                     Row(
                         modifier = Modifier
                             .weight(1f)
-                            .clickable { selectedGender = com.example.music_player.data.Gender.MALE }
+                            .clickable { selectedGender = com.example.music_player.data.model.Gender.MALE }
                             .padding(vertical = 8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         RadioButton(
-                            selected = selectedGender == com.example.music_player.data.Gender.MALE,
-                            onClick = { selectedGender = com.example.music_player.data.Gender.MALE }
+                            selected = selectedGender == com.example.music_player.data.model.Gender.MALE,
+                            onClick = { selectedGender = com.example.music_player.data.model.Gender.MALE }
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text("男生")
@@ -490,13 +490,13 @@ fun EditNicknameDialog(viewModel: ProfileViewModel, onDismiss: () -> Unit) {
                     Row(
                         modifier = Modifier
                             .weight(1f)
-                            .clickable { selectedGender = com.example.music_player.data.Gender.FEMALE }
+                            .clickable { selectedGender = com.example.music_player.data.model.Gender.FEMALE }
                             .padding(vertical = 8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         RadioButton(
-                            selected = selectedGender == com.example.music_player.data.Gender.FEMALE,
-                            onClick = { selectedGender = com.example.music_player.data.Gender.FEMALE }
+                            selected = selectedGender == com.example.music_player.data.model.Gender.FEMALE,
+                            onClick = { selectedGender = com.example.music_player.data.model.Gender.FEMALE }
                         )
                         Spacer(modifier = Modifier.width(4.dp))
                         Text("女生")

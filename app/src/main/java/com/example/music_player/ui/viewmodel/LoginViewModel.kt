@@ -38,7 +38,7 @@ class LoginViewModel(private val userService: UserService) : ViewModel() {
         }
     }
 
-    fun register(nickname: String, username: String, password: String, gender: com.example.music_player.data.Gender) {
+    fun register(nickname: String, username: String, password: String, gender: com.example.music_player.data.model.Gender) {
         viewModelScope.launch {
             _registerState.value = AuthUiState.Loading
             if (nickname.isBlank() || username.isBlank() || password.isBlank()) {

@@ -1,7 +1,8 @@
-package com.example.music_player.data
+package com.example.music_player.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.example.music_player.data.model.Gender
 import java.util.Date
 
 @Entity(tableName = "user_table")
@@ -14,3 +15,4 @@ data class User(
     var gender: Gender = Gender.MALE, // 性别，默认为男生
     var lastLoginTime: Date? = null // 最后登录时间
 )
+

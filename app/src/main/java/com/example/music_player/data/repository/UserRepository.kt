@@ -1,6 +1,11 @@
-package com.example.music_player.data
+package com.example.music_player.data.repository
 
 import android.content.Context
+import com.example.music_player.data.DataStoreManager
+import com.example.music_player.data.local.AppDatabase
+import com.example.music_player.data.local.dao.UserDao
+import com.example.music_player.data.local.entity.User
+import com.example.music_player.data.model.Gender
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 

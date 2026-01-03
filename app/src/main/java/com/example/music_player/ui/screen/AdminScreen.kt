@@ -30,7 +30,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.compose.runtime.rememberCoroutineScope
 import com.example.music_player.data.DataStoreManager
-import com.example.music_player.data.User
+import com.example.music_player.data.local.entity.User
 import com.example.music_player.data.UserService
 import com.example.music_player.navigation.Screen
 import com.example.music_player.ui.theme.ActiveColor
@@ -275,7 +275,7 @@ fun UserItem(
                     )
                 } else {
                     // 根据性别显示默认头像
-                    val defaultAvatarRes = if (user.gender == com.example.music_player.data.Gender.MALE) {
+                    val defaultAvatarRes = if (user.gender == com.example.music_player.data.model.Gender.MALE) {
                         com.example.music_player.R.drawable.default_man
                     } else {
                         com.example.music_player.R.drawable.default_woman
@@ -305,7 +305,7 @@ fun UserItem(
                     Spacer(modifier = Modifier.width(4.dp))
                     Image(
                         painter = painterResource(
-                            id = if (user.gender == com.example.music_player.data.Gender.MALE) {
+                            id = if (user.gender == com.example.music_player.data.model.Gender.MALE) {
                                 com.example.music_player.R.drawable.male
                             } else {
                                 com.example.music_player.R.drawable.female

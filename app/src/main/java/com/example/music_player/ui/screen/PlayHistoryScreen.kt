@@ -8,7 +8,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -25,8 +25,8 @@ import com.example.music_player.ui.theme.ActiveMusicGradientDark
 import com.example.music_player.ui.theme.ActiveMusicGradientLight
 import com.example.music_player.ui.theme.DarkBackground
 import androidx.navigation.NavController
-import com.example.music_player.data.MusicFile
-import com.example.music_player.data.PlayHistory
+import com.example.music_player.data.model.MusicFile
+import com.example.music_player.data.local.entity.PlayHistory
 import com.example.music_player.service.MusicServiceConnection
 import com.example.music_player.ui.component.BottomPlayerBar
 import com.example.music_player.ui.component.ScrollingTitle
@@ -34,6 +34,7 @@ import com.example.music_player.ui.viewmodel.ProfileViewModel
 import com.example.music_player.navigation.Screen
 import java.text.SimpleDateFormat
 import java.util.Locale
+import androidx.compose.ui.text.font.FontFamily
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -56,16 +57,19 @@ fun PlayHistoryScreen(
             TopAppBar(
                 title = { 
                     Text(
-                        "播放历史",
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
-                    ) 
+                        "Play History",
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            fontFamily = FontFamily.Cursive
+                        ),
+                        fontWeight = FontWeight.Bold,
+                        color = ActiveColor
+                    )
                 },
                 navigationIcon = {
                     IconButton(onClick = { 
                         navController.popBackStack()
                     }) {
-                        Icon(Icons.Filled.ArrowBack, contentDescription = "返回")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "返回")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(

@@ -7,9 +7,9 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.music_player.data.AppDatabase
-import com.example.music_player.data.MusicRepository
-import com.example.music_player.data.UserRepository
+import com.example.music_player.data.local.AppDatabase
+import com.example.music_player.data.repository.MusicRepository
+import com.example.music_player.data.repository.UserRepository
 import com.example.music_player.data.UserService
 import com.example.music_player.service.MusicServiceConnection
 import com.example.music_player.ui.screen.*

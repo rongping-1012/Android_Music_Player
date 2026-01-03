@@ -20,7 +20,7 @@ import androidx.navigation.NavController
 import com.example.music_player.navigation.Screen
 import com.example.music_player.ui.viewmodel.AuthUiState
 import com.example.music_player.ui.viewmodel.LoginViewModel
-import com.example.music_player.data.Gender
+import com.example.music_player.data.model.Gender
 
 @Composable
 fun RegisterScreen(navController: NavController, viewModel: LoginViewModel) {

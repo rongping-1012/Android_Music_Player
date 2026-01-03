@@ -1,4 +1,4 @@
-package com.example.music_player.data
+package com.example.music_player.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -12,4 +12,5 @@ data class PlayHistory(
     val songPath: String,
     val songName: String,
     val playTime: Date
-) 
+)
+

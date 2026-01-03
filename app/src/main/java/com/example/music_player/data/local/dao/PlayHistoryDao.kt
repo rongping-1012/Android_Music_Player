@@ -1,8 +1,10 @@
-package com.example.music_player.data
+package com.example.music_player.data.local.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.Query
+import com.example.music_player.data.local.entity.PlayHistory
+import java.util.Date
 
 @Dao
 interface PlayHistoryDao {
@@ -19,5 +21,6 @@ interface PlayHistoryDao {
     suspend fun getHistoryBySongPath(username: String, songPath: String): PlayHistory?
     
     @Query("UPDATE play_history SET playTime = :playTime WHERE username = :username AND songPath = :songPath")
-    suspend fun updateHistoryTime(username: String, songPath: String, playTime: java.util.Date)
-} 
+    suspend fun updateHistoryTime(username: String, songPath: String, playTime: Date)
+}
+

@@ -4,10 +4,10 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.music_player.data.DataStoreManager
-import com.example.music_player.data.FavoriteMusic
-import com.example.music_player.data.MusicRepository
-import com.example.music_player.data.PlayHistory
-import com.example.music_player.data.User
+import com.example.music_player.data.local.entity.FavoriteMusic
+import com.example.music_player.data.repository.MusicRepository
+import com.example.music_player.data.local.entity.PlayHistory
+import com.example.music_player.data.local.entity.User
 import com.example.music_player.data.UserService
 import com.example.music_player.service.MusicServiceConnection
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -95,7 +95,7 @@ class ProfileViewModel(
         }
     }
     
-    fun updateGender(gender: com.example.music_player.data.Gender) {
+    fun updateGender(gender: com.example.music_player.data.model.Gender) {
         viewModelScope.launch {
             _updateNicknameState.value = UpdateResultState.Loading
             val result = userService.updateGender(gender)

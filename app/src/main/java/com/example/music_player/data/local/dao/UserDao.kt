@@ -1,10 +1,12 @@
-package com.example.music_player.data
+package com.example.music_player.data.local.dao
 
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Update
+import com.example.music_player.data.local.entity.User
+import com.example.music_player.data.model.Gender
 import java.util.Date
 
 @Dao
@@ -56,5 +58,5 @@ interface UserDao {
     
     @Query("UPDATE user_table SET password = :newPassword WHERE username = :username")
     suspend fun adminUpdatePassword(username: String, newPassword: String)
-
 }
+

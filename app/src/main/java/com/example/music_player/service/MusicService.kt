@@ -10,9 +10,9 @@ import android.os.Binder
 import android.os.Handler
 import android.os.IBinder
 import android.os.Looper
-import com.example.music_player.data.AppDatabase
-import com.example.music_player.data.MusicFile
-import com.example.music_player.data.PlayHistory
+import com.example.music_player.data.local.AppDatabase
+import com.example.music_player.data.model.MusicFile
+import com.example.music_player.data.local.entity.PlayHistory
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -170,7 +170,7 @@ class MusicService : Service() {
                             return
                         }
                     }
-                    mediaPlayer.setDataSource(this, uri)
+                mediaPlayer.setDataSource(this, uri)
                 } catch (e2: Exception) {
                     android.util.Log.e("MusicService", "Error setting data source with URI: ${e2.message}")
                     // 如果 URI 已经改变，不处理这个错误
@@ -221,10 +221,10 @@ class MusicService : Service() {
                         if (preparingUri != currentPreparingUri) {
                             return@setOnPreparedListener
                         }
-                        isPlaying = false
-                        notifyPlayStateChanged()
-                        notifyError("无法播放此音乐文件")
-                    }
+                    isPlaying = false
+                    notifyPlayStateChanged()
+                    notifyError("无法播放此音乐文件")
+                }
                 }
             }
             
@@ -257,9 +257,9 @@ class MusicService : Service() {
                     android.util.Log.d("MusicService", "URI changed during outer catch, aborting")
                     return
                 }
-                isPlaying = false
-                notifyPlayStateChanged()
-                notifyError("找不到音乐源或无法播放")
+            isPlaying = false
+            notifyPlayStateChanged()
+            notifyError("找不到音乐源或无法播放")
             }
         }
     }
@@ -282,8 +282,8 @@ class MusicService : Service() {
                     playMusic(musicFiles[position].uri)
                 }
             } else {
-                currentTrackIndex = position
-                playMusic(musicFiles[position].uri)
+            currentTrackIndex = position
+            playMusic(musicFiles[position].uri)
             }
         } else {
             // 如果位置无效，重置为0
@@ -314,7 +314,7 @@ class MusicService : Service() {
             }
             PlayMode.SEQUENTIAL -> {
                 currentTrackIndex = (currentTrackIndex + 1) % musicFiles.size
-                playMusic(musicFiles[currentTrackIndex].uri)
+        playMusic(musicFiles[currentTrackIndex].uri)
             }
         }
     }
@@ -338,7 +338,7 @@ class MusicService : Service() {
             }
             PlayMode.SEQUENTIAL -> {
                 currentTrackIndex = if (currentTrackIndex > 0) currentTrackIndex - 1 else musicFiles.size - 1
-                playMusic(musicFiles[currentTrackIndex].uri)
+        playMusic(musicFiles[currentTrackIndex].uri)
             }
         }
     }

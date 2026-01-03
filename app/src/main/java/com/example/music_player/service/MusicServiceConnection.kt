@@ -5,7 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.ServiceConnection
 import android.os.IBinder
-import com.example.music_player.data.MusicFile
+import com.example.music_player.data.model.MusicFile
 import com.example.music_player.service.MusicService
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

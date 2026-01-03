@@ -16,7 +16,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.example.music_player.data.MusicFile
+import com.example.music_player.data.model.MusicFile
 
 @Composable
 fun BottomPlayerBar(

@@ -4,10 +4,11 @@ import android.content.Context
 import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.music_player.data.MusicFile
 import com.example.music_player.data.DataStoreManager
-import com.example.music_player.data.MusicRepository
+import com.example.music_player.data.model.MusicFile
+import com.example.music_player.data.repository.MusicRepository
 import com.example.music_player.data.UserService
+import com.example.music_player.data.remote.BannerData
 import com.example.music_player.service.MusicServiceConnection
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -46,6 +47,12 @@ class UserViewModel(
     
     private val _favoriteMap = MutableStateFlow<Map<String, Boolean>>(emptyMap())
     val favoriteMap: StateFlow<Map<String, Boolean>> = _favoriteMap.asStateFlow()
+    
+    private val _banners = MutableStateFlow<List<BannerData>>(emptyList())
+    val banners: StateFlow<List<BannerData>> = _banners.asStateFlow()
+    
+    private val _bannersLoading = MutableStateFlow(false)
+    val bannersLoading: StateFlow<Boolean> = _bannersLoading.asStateFlow()
 
     fun loadMusic() {
         viewModelScope.launch {
@@ -147,6 +154,30 @@ class UserViewModel(
                 _favoriteMap.value = newMap
             } catch (e: Exception) {
                 e.printStackTrace()
+            }
+        }
+    }
+    
+    /**
+     * 加载轮播图数据（网络请求）
+     */
+    fun loadBanners() {
+        viewModelScope.launch {
+            _bannersLoading.value = true
+            try {
+                val result = musicRepository.getBanners()
+                result.onSuccess { bannerList ->
+                    _banners.value = bannerList
+                }.onFailure { exception ->
+                    // 网络请求失败时，使用空列表或默认数据
+                    _banners.value = emptyList()
+                    android.util.Log.e("UserViewModel", "加载轮播图失败", exception)
+                }
+            } catch (e: Exception) {
+                _banners.value = emptyList()
+                android.util.Log.e("UserViewModel", "加载轮播图异常", e)
+            } finally {
+                _bannersLoading.value = false
             }
         }
     }
