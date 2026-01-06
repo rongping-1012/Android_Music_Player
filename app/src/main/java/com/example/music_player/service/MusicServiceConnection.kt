@@ -27,6 +27,9 @@ class MusicServiceConnection(context: Context) : MusicService.OnPlaybackStateCha
     private val _playMode = MutableStateFlow(MusicService.PlayMode.SEQUENTIAL)
     val playMode = _playMode.asStateFlow()
 
+    private val _playCount = MutableStateFlow(0)
+    val playCount = _playCount.asStateFlow()
+
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage = _errorMessage.asStateFlow()
 
@@ -102,9 +105,22 @@ class MusicServiceConnection(context: Context) : MusicService.OnPlaybackStateCha
         return musicService?.getVolume() ?: 1f
     }
 
+    fun getPlaylist(): List<com.example.music_player.data.model.MusicFile> {
+        return musicService?.getMusicListSnapshot() ?: emptyList()
+    }
+
+    fun getCurrentIndex(): Int {
+        return musicService?.getCurrentIndex() ?: -1
+    }
+
+    fun playAt(position: Int) {
+        musicService?.playMusicAtPosition(position)
+    }
+
     // --- Service Listener Callbacks ---
     override fun onSongChanged(song: MusicFile?) {
         _currentSong.value = song
+        _playCount.value = musicService?.getPlayCount(song?.uri) ?: 0
     }
 
     override fun onPlayStateChanged(isPlaying: Boolean) {
@@ -118,6 +134,10 @@ class MusicServiceConnection(context: Context) : MusicService.OnPlaybackStateCha
     
     override fun onPlayModeChanged(mode: MusicService.PlayMode) {
         _playMode.value = mode
+    }
+    
+    override fun onPlayCountChanged(count: Int) {
+        _playCount.value = count
     }
     
     override fun onError(message: String) {

@@ -21,14 +21,13 @@ fun AppNavigation(darkTheme: Boolean, toggleTheme: () -> Unit) {
     val navController = rememberNavController()
     val context = LocalContext.current
 
-    // Create dependencies that can be shared across ViewModels
     val userService = remember { UserService(context) }
     val userRepository = remember { UserRepository(AppDatabase.getDatabase(context).userDao(), context) }
     val musicServiceConnection = remember { MusicServiceConnection(context) }
 
     NavHost(navController = navController, startDestination = Screen.Splash.route) {
         composable(Screen.Splash.route) {
-            SplashScreen(navController = navController)
+            SplashScreen(navController = navController, userService = userService)
         }
         composable(Screen.Login.route) {
             val loginViewModel: LoginViewModel = viewModel(factory = LoginViewModelFactory(userService))
@@ -74,8 +73,10 @@ fun AppNavigation(darkTheme: Boolean, toggleTheme: () -> Unit) {
             ProfileScreen(navController = navController, viewModel = profileViewModel, darkTheme = darkTheme, onToggleTheme = toggleTheme)
         }
         composable(Screen.Player.route) {
+            val musicRepository = MusicRepository(context)
+            val userViewModel: UserViewModel = viewModel(factory = UserViewModelFactory(musicRepository, musicServiceConnection, context))
             val playerViewModel: PlayerViewModel = viewModel(factory = PlayerViewModelFactory(musicServiceConnection))
-            PlayerScreen(navController = navController, viewModel = playerViewModel)
+            PlayerScreen(navController = navController, viewModel = playerViewModel, userViewModel = userViewModel)
         }
         composable(Screen.PlayHistory.route) {
             val musicRepository = MusicRepository(context)

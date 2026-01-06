@@ -27,6 +27,7 @@ class MusicService : Service() {
     enum class PlayMode { SEQUENTIAL, SHUFFLE, REPEAT_ONE }
     private var currentPlayMode = PlayMode.SEQUENTIAL
     private val random = java.util.Random()
+    private val playCountMap = mutableMapOf<String, Int>()
     
     // 洗牌播放列表：存储原始索引的随机排列
     private val shuffledPlaylist = mutableListOf<Int>()
@@ -50,6 +51,7 @@ class MusicService : Service() {
         fun onProgressChanged(currentPosition: Int, duration: Int)
         fun onPlayModeChanged(mode: PlayMode)
         fun onError(message: String)
+        fun onPlayCountChanged(count: Int)
     }
 
     private val listeners = mutableListOf<OnPlaybackStateChangeListener>()
@@ -76,13 +78,13 @@ class MusicService : Service() {
     
     private fun setupMediaPlayer() {
         mediaPlayer.setOnCompletionListener {
-            playNext(true) // True indicates it's from completion
+            playNext()
         }
         
         // 注意：错误监听器在 playMusic 中动态设置，以便检查 preparingUri
         
         // 添加信息监听器
-        mediaPlayer.setOnInfoListener { mp, what, extra ->
+        mediaPlayer.setOnInfoListener { _, what, extra ->
             when (what) {
                 android.media.MediaPlayer.MEDIA_INFO_BAD_INTERLEAVING,
                 android.media.MediaPlayer.MEDIA_INFO_NOT_SEEKABLE,
@@ -96,12 +98,6 @@ class MusicService : Service() {
 
     fun playMusic(uri: Uri) {
         try {
-            // 检查 URI 是否有效
-            if (uri == null || uri.toString().isEmpty()) {
-                android.util.Log.e("MusicService", "Invalid URI: $uri")
-                return
-            }
-            
             // 如果在随机播放模式下，找到该 URI 在洗牌列表中的位置
             if (currentPlayMode == PlayMode.SHUFFLE && shuffledPlaylist.isNotEmpty()) {
                 val fileIndex = musicFiles.indexOfFirst { it.uri == uri }
@@ -209,8 +205,10 @@ class MusicService : Service() {
                 
                 try {
                     mp.start()
+                    incrementPlayCount(uri)
                     isPlaying = true
                     notifySongChanged()
+                    notifyPlayCountChanged(uri)
                     notifyPlayStateChanged()
                     handler.post(updateProgressAction)
                     savePlayHistory(uri)
@@ -229,7 +227,7 @@ class MusicService : Service() {
             }
             
             // 设置错误监听器，但只在 URI 匹配时报告错误
-            mediaPlayer.setOnErrorListener { mp, what, extra ->
+            mediaPlayer.setOnErrorListener { _, what, extra ->
                 // 如果 URI 已经改变，不处理这个错误
                 synchronized(this) {
                     if (preparingUri != currentPreparingUri) {
@@ -295,7 +293,7 @@ class MusicService : Service() {
         }
     }
 
-    fun playNext(fromCompletion: Boolean = false) {
+    fun playNext() {
         if (musicFiles.isEmpty()) return
         when (currentPlayMode) {
             PlayMode.REPEAT_ONE -> {
@@ -393,6 +391,15 @@ class MusicService : Service() {
     fun isPlaying(): Boolean = isPlaying
     fun getPlayMode(): PlayMode = currentPlayMode
     fun getCurrentSong(): MusicFile? = musicFiles.getOrNull(currentTrackIndex)
+    fun getCurrentIndex(): Int = currentTrackIndex
+    fun getMusicListSnapshot(): List<MusicFile> = musicFiles.toList()
+    fun getPlayCount(uri: Uri?): Int = playCountMap[uri?.toString()] ?: 0
+
+    private fun incrementPlayCount(uri: Uri) {
+        val key = uri.toString()
+        val newCount = (playCountMap[key] ?: 0) + 1
+        playCountMap[key] = newCount
+    }
     
     // Volume control
     fun setVolume(volume: Float) {
@@ -463,6 +470,7 @@ class MusicService : Service() {
         listener.onPlayStateChanged(isPlaying)
         listener.onSongChanged(getCurrentSong())
         listener.onPlayModeChanged(currentPlayMode)
+        listener.onPlayCountChanged(getPlayCount(getCurrentSong()?.uri))
     }
 
     fun removePlaybackStateChangeListener(listener: OnPlaybackStateChangeListener) {
@@ -471,6 +479,11 @@ class MusicService : Service() {
 
     private fun notifySongChanged() {
         listeners.forEach { it.onSongChanged(getCurrentSong()) }
+    }
+    
+    private fun notifyPlayCountChanged(uri: Uri?) {
+        val count = getPlayCount(uri)
+        listeners.forEach { it.onPlayCountChanged(count) }
     }
 
     private fun notifyPlayStateChanged() {

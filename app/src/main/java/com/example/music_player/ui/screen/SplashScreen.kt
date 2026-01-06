@@ -5,7 +5,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -14,23 +13,25 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavController
 import com.example.music_player.R
+import com.example.music_player.data.UserService
 import com.example.music_player.navigation.Screen
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 @Composable
-fun SplashScreen(navController: NavController) {
+fun SplashScreen(navController: NavController, userService: UserService) {
     val scale = remember { Animatable(0f) }
     val rotation = remember { Animatable(0f) }
 
     LaunchedEffect(key1 = true) {
         coroutineScope {
+            // 并行执行缩放和旋转
             launch {
                 scale.animateTo(
                     targetValue = 1f,
@@ -44,11 +45,15 @@ fun SplashScreen(navController: NavController) {
                 )
             }
         }
-        // 动画结束后，导航到登录页，并从回退栈中移除启动页
-        navController.navigate(Screen.Login.route) {
-            popUpTo(Screen.Splash.route) {
-                inclusive = true
-            }
+        // 动画结束后，根据登录状态决定跳转页面
+        val username = userService.currentUsername.first()
+        val targetRoute = when {
+            username.isBlank() -> Screen.Login.route
+            username == "admin" -> Screen.AdminHome.route
+            else -> Screen.Main.route
+        }
+        navController.navigate(targetRoute) {
+            popUpTo(Screen.Splash.route) { inclusive = true }
         }
     }
 

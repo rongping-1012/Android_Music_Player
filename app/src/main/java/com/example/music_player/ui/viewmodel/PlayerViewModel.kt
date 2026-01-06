@@ -10,6 +10,7 @@ class PlayerViewModel(private val musicServiceConnection: MusicServiceConnection
     val progress = musicServiceConnection.progress
     val duration = musicServiceConnection.duration
     val playMode = musicServiceConnection.playMode
+    val playCount = musicServiceConnection.playCount
 
     fun togglePlayPause() {
         musicServiceConnection.togglePlayPause()
@@ -37,5 +38,17 @@ class PlayerViewModel(private val musicServiceConnection: MusicServiceConnection
     
     fun getVolume(): Float {
         return musicServiceConnection.getVolume()
+    }
+
+    fun getPlaylist(): List<com.example.music_player.data.model.MusicFile> {
+        return musicServiceConnection.getPlaylist()
+    }
+
+    fun getCurrentIndex(): Int {
+        return musicServiceConnection.getCurrentIndex()
+    }
+
+    fun playAt(position: Int) {
+        musicServiceConnection.playAt(position)
     }
 }
