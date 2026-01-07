@@ -325,7 +325,7 @@ fun UserItem(
                 Text(
                     text = if (user.lastLoginTime != null) {
                         val dateFormat = java.text.SimpleDateFormat("yyyy-MM-dd HH:mm", java.util.Locale.getDefault())
-                        "最后登录: ${dateFormat.format(user.lastLoginTime)}"
+                        "最后登录: ${dateFormat.format(user.lastLoginTime!!)}"
                     } else {
                         "从未登录"
                     },

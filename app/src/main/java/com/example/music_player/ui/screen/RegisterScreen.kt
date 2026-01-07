@@ -46,15 +46,42 @@ fun RegisterScreen(navController: NavController, viewModel: LoginViewModel) {
     LaunchedEffect(registerState) {
         when (val state = registerState) {
             is AuthUiState.Success -> {
-                Toast.makeText(context, "注册成功", Toast.LENGTH_SHORT).show()
-                navController.navigate(Screen.Login.route) {
-                    popUpTo(Screen.Register.route) { inclusive = true }
-                }
+                Toast.makeText(context, "注册成功，正在自动登录...", Toast.LENGTH_SHORT).show()
+                // 注册成功后自动登录
+                viewModel.login(username, password)
                 viewModel.resetRegisterState()
             }
             is AuthUiState.Error -> {
                 Toast.makeText(context, state.message, Toast.LENGTH_SHORT).show()
                 viewModel.resetRegisterState()
+            }
+            else -> Unit
+        }
+    }
+    
+    // 监听登录状态，注册成功后自动登录并跳转
+    val loginState by viewModel.loginState.collectAsStateWithLifecycle()
+    LaunchedEffect(loginState) {
+        when (val state = loginState) {
+            is AuthUiState.Success -> {
+                // 登录成功，跳转到对应页面
+                val targetRoute = if (state.isAdmin) {
+                    Screen.AdminHome.route
+                } else {
+                    Screen.Main.route
+                }
+                navController.navigate(targetRoute) {
+                    popUpTo(Screen.Splash.route) { inclusive = true }
+                }
+                viewModel.resetLoginState()
+            }
+            is AuthUiState.Error -> {
+                // 自动登录失败，跳转到登录页面
+                Toast.makeText(context, "自动登录失败: ${state.message}", Toast.LENGTH_SHORT).show()
+                navController.navigate(Screen.Login.route) {
+                    popUpTo(Screen.Register.route) { inclusive = true }
+                }
+                viewModel.resetLoginState()
             }
             else -> Unit
         }

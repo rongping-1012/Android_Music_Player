@@ -61,7 +61,7 @@ fun BottomPlayerBar(
                 modifier = Modifier.weight(1f)
             ) {
                 Text(
-                    text = song.name,
+                    text = song.name.substringBeforeLast("."),
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Medium,
                     color = MaterialTheme.colorScheme.onSurface,

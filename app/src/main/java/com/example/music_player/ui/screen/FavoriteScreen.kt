@@ -122,13 +122,16 @@ fun FavoriteScreen(
                                 favorite = favorite,
                                 isPlaying = isCurrentlyPlaying,
                                 onPlayClick = {
-                                    // 播放歌曲
+                                    // 播放歌曲：将整个收藏列表作为播放列表
                                     try {
-                                        val musicFile = MusicFile(
-                                            name = favorite.songName,
-                                            uri = Uri.parse(favorite.songPath)
-                                        )
-                                        musicServiceConnection.playMusic(listOf(musicFile), 0)
+                                        val musicFiles = favorites.map { fav ->
+                                            MusicFile(
+                                                name = fav.songName,
+                                                uri = Uri.parse(fav.songPath)
+                                            )
+                                        }
+                                        val position = favorites.indexOf(favorite)
+                                        musicServiceConnection.playMusic(musicFiles, position)
                                     } catch (e: Exception) {
                                         e.printStackTrace()
                                     }
@@ -198,7 +201,7 @@ fun FavoriteItem(
             ) {
                 if (isPlaying) {
                     ScrollingTitle(
-                        text = favorite.songName,
+                        text = favorite.songName.substringBeforeLast("."),
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Bold,
                         color = if (isDarkTheme) ActiveColorLight else ActiveColor,
@@ -206,7 +209,7 @@ fun FavoriteItem(
                     )
                 } else {
                     Text(
-                        text = favorite.songName,
+                        text = favorite.songName.substringBeforeLast("."),
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.onSurface,

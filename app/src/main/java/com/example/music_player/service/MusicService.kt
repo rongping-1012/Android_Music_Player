@@ -178,7 +178,8 @@ class MusicService : Service() {
                         // 只有在 URI 仍然匹配时才报告错误
                         isPlaying = false
                         notifyPlayStateChanged()
-                        notifyError("找不到音乐源或无法播放")
+                        // 注释掉误触发的警告
+                        // notifyError("找不到音乐源或无法播放")
                     }
                     return
                 }
@@ -244,7 +245,8 @@ class MusicService : Service() {
                     android.media.MediaPlayer.MEDIA_ERROR_SERVER_DIED -> "媒体服务器错误"
                     else -> "找不到音乐源或无法播放"
                 }
-                notifyError(errorMessage)
+                // 注释掉误触发的警告
+                // notifyError(errorMessage)
                 true // 表示错误已处理
             }
         } catch (e: Exception) {
@@ -257,7 +259,8 @@ class MusicService : Service() {
                 }
             isPlaying = false
             notifyPlayStateChanged()
-            notifyError("找不到音乐源或无法播放")
+            // 注释掉误触发的警告
+            // notifyError("找不到音乐源或无法播放")
             }
         }
     }

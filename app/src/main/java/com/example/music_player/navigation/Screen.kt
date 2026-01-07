@@ -11,5 +11,6 @@ sealed class Screen(val route: String) {
     object Player : Screen("player")
     object PlayHistory : Screen("play_history")
     object Favorite : Screen("favorite")
+    object About : Screen("about")
 }
 

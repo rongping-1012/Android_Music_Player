@@ -124,13 +124,16 @@ fun PlayHistoryScreen(
                                 dateFormat = dateFormat,
                                 isPlaying = isCurrentlyPlaying,
                                 onClick = {
-                                    // 播放歌曲
+                                    // 播放歌曲：将整个播放历史列表作为播放列表
                                     try {
-                                        val musicFile = MusicFile(
-                                            name = history.songName,
-                                            uri = Uri.parse(history.songPath)
-                                        )
-                                        musicServiceConnection.playMusic(listOf(musicFile), 0)
+                                        val musicFiles = playHistory.map { hist ->
+                                            MusicFile(
+                                                name = hist.songName,
+                                                uri = Uri.parse(hist.songPath)
+                                            )
+                                        }
+                                        val position = playHistory.indexOf(history)
+                                        musicServiceConnection.playMusic(musicFiles, position)
                                     } catch (e: Exception) {
                                         e.printStackTrace()
                                     }
@@ -197,7 +200,7 @@ fun PlayHistoryItem(
             ) {
                 if (isPlaying) {
                     ScrollingTitle(
-                        text = history.songName,
+                        text = history.songName.substringBeforeLast("."),
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Bold,
                         color = if (isDarkTheme) ActiveColorLight else ActiveColor,
@@ -205,7 +208,7 @@ fun PlayHistoryItem(
                     )
                 } else {
                     Text(
-                        text = history.songName,
+                        text = history.songName.substringBeforeLast("."),
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Medium,
                         color = MaterialTheme.colorScheme.onSurface,

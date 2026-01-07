@@ -30,6 +30,22 @@ fun SplashScreen(navController: NavController, userService: UserService) {
     val rotation = remember { Animatable(0f) }
 
     LaunchedEffect(key1 = true) {
+        // 先检查登录状态
+        val username = userService.currentUsername.first()
+        
+        // 如果已登录，跳过动画直接跳转
+        if (username.isNotBlank()) {
+            val targetRoute = when {
+                username == "admin" -> Screen.AdminHome.route
+                else -> Screen.Main.route
+            }
+            navController.navigate(targetRoute) {
+                popUpTo(Screen.Splash.route) { inclusive = true }
+            }
+            return@LaunchedEffect
+        }
+        
+        // 未登录时显示动画
         coroutineScope {
             // 并行执行缩放和旋转
             launch {
@@ -45,14 +61,8 @@ fun SplashScreen(navController: NavController, userService: UserService) {
                 )
             }
         }
-        // 动画结束后，根据登录状态决定跳转页面
-        val username = userService.currentUsername.first()
-        val targetRoute = when {
-            username.isBlank() -> Screen.Login.route
-            username == "admin" -> Screen.AdminHome.route
-            else -> Screen.Main.route
-        }
-        navController.navigate(targetRoute) {
+        // 动画结束后，跳转到登录页面
+        navController.navigate(Screen.Login.route) {
             popUpTo(Screen.Splash.route) { inclusive = true }
         }
     }

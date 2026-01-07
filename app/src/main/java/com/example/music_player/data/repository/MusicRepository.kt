@@ -2,6 +2,7 @@ package com.example.music_player.data.repository
 
 import android.content.ContentUris
 import android.content.Context
+import android.media.MediaScannerConnection
 import android.net.Uri
 import android.provider.MediaStore
 import androidx.documentfile.provider.DocumentFile
@@ -11,9 +12,11 @@ import com.example.music_player.data.local.entity.FavoriteMusic
 import com.example.music_player.data.local.entity.PlayHistory
 import com.example.music_player.data.model.MusicFile
 import com.example.music_player.data.remote.BannerData
+import com.example.music_player.utils.AssetMusicManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.withContext
+import java.io.File
 
 class MusicRepository(
     private val context: Context
@@ -31,6 +34,8 @@ class MusicRepository(
 
     suspend fun getMusicFiles(): List<MusicFile> = withContext(Dispatchers.IO) {
         val musicList = mutableListOf<MusicFile>()
+        
+        // 1. 扫描 MediaStore（公共存储中的音乐）
         val collection = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
 
         val projection = arrayOf(
@@ -40,7 +45,6 @@ class MusicRepository(
         )
 
         val selection = "${MediaStore.Audio.Media.IS_MUSIC} != 0"
-        // 不排序，保持原始顺序
 
         context.contentResolver.query(
             collection,
@@ -62,7 +66,44 @@ class MusicRepository(
                 musicList.add(MusicFile(name = name, uri = contentUri))
             }
         }
+        
+        // 2. 扫描应用私有目录中的音乐文件（从 assets 复制的）
+        val musicFolderPath = AssetMusicManager.getMusicFolderPath(context)
+        if (musicFolderPath != null) {
+            val musicFolder = File(musicFolderPath)
+            if (musicFolder.exists() && musicFolder.isDirectory) {
+                musicFolder.listFiles()?.forEach { file ->
+                    if (file.isFile && isAudioFile(file.name)) {
+                        // 使用 file:// URI
+                        val fileUri = Uri.fromFile(file)
+                        musicList.add(MusicFile(name = file.name, uri = fileUri))
+                        
+                        // 尝试将文件添加到 MediaStore（可选，用于更好的兼容性）
+                        try {
+                            MediaScannerConnection.scanFile(
+                                context,
+                                arrayOf(file.absolutePath),
+                                arrayOf("audio/*"),
+                                null
+                            )
+                        } catch (e: Exception) {
+                            // 忽略扫描错误
+                        }
+                    }
+                }
+            }
+        }
+        
         musicList
+    }
+    
+    /**
+     * 检查文件是否为音频文件
+     */
+    private fun isAudioFile(fileName: String): Boolean {
+        val audioExtensions = listOf(".mp3", ".flac", ".m4a", ".wav", ".ogg", ".aac", ".wma")
+        val lowerName = fileName.lowercase()
+        return audioExtensions.any { lowerName.endsWith(it) }
     }
 
     suspend fun getMusicFilesFromFolder(uri: Uri): List<MusicFile> = withContext(Dispatchers.IO) {

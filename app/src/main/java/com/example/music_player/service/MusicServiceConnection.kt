@@ -48,10 +48,23 @@ class MusicServiceConnection(context: Context) : MusicService.OnPlaybackStateCha
         }
     }
 
+    private val contextRef = context.applicationContext
+
     init {
-        Intent(context, MusicService::class.java).also { intent ->
-            context.bindService(intent, connection, Context.BIND_AUTO_CREATE)
-            context.startService(intent)
+        Intent(contextRef, MusicService::class.java).also { intent ->
+            contextRef.bindService(intent, connection, Context.BIND_AUTO_CREATE)
+            contextRef.startService(intent)
+        }
+    }
+    
+    /**
+     * 解绑服务连接
+     */
+    fun unbind() {
+        try {
+            contextRef.unbindService(connection)
+        } catch (e: Exception) {
+            // 如果已经解绑，忽略异常
         }
     }
 

@@ -140,7 +140,7 @@ fun ProfileScreen(navController: NavController, viewModel: ProfileViewModel, dar
                             if (avatarUri != null) {
                                 AsyncImage(
                                     model = ImageRequest.Builder(context)
-                                        .data(File(avatarUri))
+                                        .data(File(avatarUri!!))
                                         .crossfade(true)
                                         .build(),
                                     contentDescription = "头像（点击上传）",
@@ -296,6 +296,42 @@ fun ProfileScreen(navController: NavController, viewModel: ProfileViewModel, dar
                                             }
                                         },
                                         enabled = isLoggedIn
+                                    )
+                                }
+                                
+                                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                                
+                                // 关于
+                                Row(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .heightIn(min = 56.dp)
+                                        .clickable { 
+                                            navController.navigate(Screen.About.route)
+                                        }
+                                        .padding(vertical = 12.dp),
+                                    horizontalArrangement = Arrangement.SpaceBetween,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                        Icon(
+                                            imageVector = Icons.Filled.Info,
+                                            contentDescription = null,
+                                            tint = MaterialTheme.colorScheme.primary,
+                                            modifier = Modifier.size(24.dp)
+                                        )
+                                        Spacer(modifier = Modifier.width(16.dp))
+                                        Text(
+                                            text = "关于",
+                                            style = MaterialTheme.typography.bodyLarge,
+                                            color = MaterialTheme.colorScheme.onSurface
+                                        )
+                                    }
+                                    Icon(
+                                        imageVector = Icons.Filled.ChevronRight,
+                                        contentDescription = null,
+                                        tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                                        modifier = Modifier.size(24.dp)
                                     )
                                 }
                             }

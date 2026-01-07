@@ -426,7 +426,7 @@ fun MusicItem(
             ) {
                 if (isPlaying) {
                     ScrollingTitle(
-                        text = musicFile.name,
+                        text = musicFile.name.substringBeforeLast("."),
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Bold,
                         color = if (isDarkTheme) ActiveColorLight else ActiveColor,
@@ -434,7 +434,7 @@ fun MusicItem(
                     )
                 } else {
                 Text(
-                    text = musicFile.name,
+                    text = musicFile.name.substringBeforeLast("."),
                     style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Normal,
                         color = MaterialTheme.colorScheme.onSurface,

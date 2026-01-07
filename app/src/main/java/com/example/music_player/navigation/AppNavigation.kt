@@ -75,8 +75,14 @@ fun AppNavigation(darkTheme: Boolean, toggleTheme: () -> Unit) {
         composable(Screen.Player.route) {
             val musicRepository = MusicRepository(context)
             val userViewModel: UserViewModel = viewModel(factory = UserViewModelFactory(musicRepository, musicServiceConnection, context))
-            val playerViewModel: PlayerViewModel = viewModel(factory = PlayerViewModelFactory(musicServiceConnection))
-            PlayerScreen(navController = navController, viewModel = playerViewModel, userViewModel = userViewModel)
+            val playerViewModel: PlayerViewModel = viewModel(factory = PlayerViewModelFactory(musicServiceConnection, context))
+            PlayerScreen(
+                navController = navController, 
+                viewModel = playerViewModel, 
+                userViewModel = userViewModel,
+                darkTheme = darkTheme,
+                onToggleTheme = toggleTheme
+            )
         }
         composable(Screen.PlayHistory.route) {
             val musicRepository = MusicRepository(context)
@@ -87,6 +93,9 @@ fun AppNavigation(darkTheme: Boolean, toggleTheme: () -> Unit) {
             val musicRepository = MusicRepository(context)
             val profileViewModel: ProfileViewModel = viewModel(factory = ProfileViewModelFactory(userService, musicServiceConnection, musicRepository, context))
             FavoriteScreen(navController = navController, viewModel = profileViewModel, musicServiceConnection = musicServiceConnection)
+        }
+        composable(Screen.About.route) {
+            AboutScreen(navController = navController)
         }
     }
 }

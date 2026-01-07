@@ -41,7 +41,7 @@ fun MainScreen(
     
     // 使用 DisposableEffect 监听导航变化
     DisposableEffect(navController) {
-        val listener = NavController.OnDestinationChangedListener { controller, destination, arguments ->
+        val listener = NavController.OnDestinationChangedListener { controller, destination, _ ->
             if (destination.route == Screen.Main.route) {
                 // 检查上一个路由是否是 Favorite 或 PlayHistory
                 val previousEntry = controller.previousBackStackEntry
