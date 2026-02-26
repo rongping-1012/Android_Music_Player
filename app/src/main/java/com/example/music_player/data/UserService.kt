@@ -56,15 +56,11 @@ class UserService(private val context: Context) {
         }
     }
 
-    suspend fun resetPassword(username: String, oldPassword: String, newPassword: String): Result<Unit> {
+    suspend fun resetPassword(username: String, newPassword: String): Result<Unit> {
         return try {
             val user = userRepository.getUserByUsername(username)
             if (user == null) {
                 return Result.failure(Exception("用户名不存在"))
-            }
-            
-            if (user.password != oldPassword) {
-                return Result.failure(Exception("旧密码错误"))
             }
             
             val rowsUpdated = userRepository.resetPassword(username, newPassword)

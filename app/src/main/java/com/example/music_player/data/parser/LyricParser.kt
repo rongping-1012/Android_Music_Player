@@ -64,18 +64,15 @@ object LyricParser {
     private fun parseFromReader(reader: BufferedReader): LyricData {
         val lines = mutableListOf<LyricLine>()
         var offset = 0L
-
         reader.forEachLine { line ->
             val trimmedLine = line.trim()
             if (trimmedLine.isEmpty()) return@forEachLine
-
             // 检查偏移量标签
             val offsetMatcher = OFFSET_PATTERN.matcher(trimmedLine)
             if (offsetMatcher.find()) {
                 offset = offsetMatcher.group(1).toLongOrNull() ?: 0L
                 return@forEachLine
             }
-
             // 解析时间标签和歌词文本
             val timeMatcher = TIME_TAG_PATTERN.matcher(trimmedLine)
             val timeTags = mutableListOf<Long>()
@@ -84,15 +81,12 @@ object LyricParser {
                 val minutes = timeMatcher.group(1).toInt()
                 val seconds = timeMatcher.group(2).toInt()
                 val milliseconds = timeMatcher.group(3)?.toIntOrNull() ?: 0
-                
                 val timeMs = (minutes * 60 + seconds) * 1000L + milliseconds * 10L
                 timeTags.add(timeMs)
             }
-
             // 提取歌词文本（移除所有时间标签）
             // 使用 Java Pattern 的 matcher().replaceAll 来移除时间标签，避免与 Kotlin String.replace 重载冲突
             val text = TIME_TAG_PATTERN.matcher(trimmedLine).replaceAll("").trim()
-
             // 如果有时间标签和文本，添加到列表
             if (timeTags.isNotEmpty() && text.isNotEmpty()) {
                 timeTags.forEach { time ->
@@ -100,10 +94,8 @@ object LyricParser {
                 }
             }
         }
-
         // 按时间排序
         lines.sortBy { it.time }
-
         return LyricData(lines, offset)
     }
 

@@ -13,9 +13,11 @@ import android.os.Looper
 import com.example.music_player.data.local.AppDatabase
 import com.example.music_player.data.model.MusicFile
 import com.example.music_player.data.local.entity.PlayHistory
+import com.example.music_player.data.DataStoreManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.first
 import java.util.*
 
 class MusicService : Service() {
@@ -508,11 +510,15 @@ class MusicService : Service() {
     }
 
     private fun savePlayHistory(uri: Uri) {
-        val username = getSharedPreferences("UserPreferences", Context.MODE_PRIVATE).getString("currentUsername", null) ?: return
         val currentMusic = getCurrentSong() ?: return
         val songPath = uri.toString()
         val playHistoryDao = AppDatabase.getDatabase(applicationContext).playHistoryDao()
+        val dataStoreManager = DataStoreManager(applicationContext)
         CoroutineScope(Dispatchers.IO).launch {
+            val username = dataStoreManager.currentUsername.first()
+            if (username.isBlank()) {
+                return@launch // 如果用户未登录，不保存播放历史
+            }
             val existingHistory = playHistoryDao.getHistoryBySongPath(username, songPath)
             if (existingHistory != null) {
                 // 如果已存在，更新播放时间

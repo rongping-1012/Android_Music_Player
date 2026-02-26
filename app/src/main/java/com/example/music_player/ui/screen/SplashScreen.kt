@@ -28,11 +28,9 @@ import kotlinx.coroutines.launch
 fun SplashScreen(navController: NavController, userService: UserService) {
     val scale = remember { Animatable(0f) }
     val rotation = remember { Animatable(0f) }
-
     LaunchedEffect(key1 = true) {
         // 先检查登录状态
         val username = userService.currentUsername.first()
-        
         // 如果已登录，跳过动画直接跳转
         if (username.isNotBlank()) {
             val targetRoute = when {
@@ -44,7 +42,6 @@ fun SplashScreen(navController: NavController, userService: UserService) {
             }
             return@LaunchedEffect
         }
-        
         // 未登录时显示动画
         coroutineScope {
             // 并行执行缩放和旋转
@@ -66,7 +63,6 @@ fun SplashScreen(navController: NavController, userService: UserService) {
             popUpTo(Screen.Splash.route) { inclusive = true }
         }
     }
-
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -84,7 +80,9 @@ fun SplashScreen(navController: NavController, userService: UserService) {
         contentAlignment = Alignment.Center
     ) {
             Image(
-                painter = painterResource(id = R.drawable.ic_baseline_music_background_white),
+                painter = painterResource(
+                    id = R.drawable.ic_baseline_music_background_white
+                ),
                 contentDescription = "App Logo",
                 modifier = Modifier
                     .scale(scale.value)

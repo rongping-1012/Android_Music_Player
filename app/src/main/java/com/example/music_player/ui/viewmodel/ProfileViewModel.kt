@@ -59,13 +59,25 @@ class ProfileViewModel(
         loadAvatarUri()
     }
 
+    /**
+     * 为头像构造一个带时间戳的展示用 URI 字符串
+     * 这样每次头像文件更新后，字符串都会变化，强制界面和图片加载库刷新
+     */
+    private fun buildAvatarDisplayUri(username: String): String? {
+        val baseUri = dataStoreManager.getAvatarUri(username) ?: return null
+        val timestamp = System.currentTimeMillis().toString()
+        return baseUri.buildUpon()
+            .appendQueryParameter("t", timestamp)
+            .build()
+            .toString()
+    }
+
     private fun loadAvatarUri() {
         viewModelScope.launch {
             val user = userService.getCurrentUser()
             if (user != null) {
-                // 从文件系统加载头像
-                val avatarPath = dataStoreManager.getAvatarPath(user.username)
-                _avatarUri.value = avatarPath
+                // 从文件系统加载头像（带时间戳，保证每次更新都会刷新）
+                _avatarUri.value = buildAvatarDisplayUri(user.username)
             }
         }
     }
@@ -147,8 +159,8 @@ class ProfileViewModel(
                 // 保存头像到文件系统
                 val savedPath = dataStoreManager.saveAvatar(user.username, uri)
                 if (savedPath != null) {
-                    // 重新加载头像路径
-                    _avatarUri.value = dataStoreManager.getAvatarPath(user.username)
+                    // 保存成功后，使用带时间戳的 URI 强制刷新头像
+                    _avatarUri.value = buildAvatarDisplayUri(user.username)
                 }
             }
         }

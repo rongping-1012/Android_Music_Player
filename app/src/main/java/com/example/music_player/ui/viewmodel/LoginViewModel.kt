@@ -58,10 +58,10 @@ class LoginViewModel(private val userService: UserService) : ViewModel() {
         }
     }
 
-    fun resetPassword(username: String, oldPassword: String, newPassword: String) {
+    fun resetPassword(username: String, newPassword: String) {
         viewModelScope.launch {
             _resetPasswordState.value = AuthUiState.Loading
-            if (username.isBlank() || oldPassword.isBlank() || newPassword.isBlank()) {
+            if (username.isBlank() || newPassword.isBlank()) {
                 _resetPasswordState.value = AuthUiState.Error("请填写所有字段")
                 return@launch
             }
@@ -69,7 +69,7 @@ class LoginViewModel(private val userService: UserService) : ViewModel() {
                 _resetPasswordState.value = AuthUiState.Error("新密码至少需要6位")
                 return@launch
             }
-            val result = userService.resetPassword(username, oldPassword, newPassword)
+            val result = userService.resetPassword(username, newPassword)
             result.onSuccess {
                 _resetPasswordState.value = AuthUiState.Success()
             }.onFailure {

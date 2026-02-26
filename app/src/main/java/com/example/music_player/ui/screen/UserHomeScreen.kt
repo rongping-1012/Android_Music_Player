@@ -243,7 +243,6 @@ fun SearchBar(
     @Suppress("UNUSED_PARAMETER") onSearchActiveChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // onSearchActiveChange 保留用于未来扩展
     OutlinedTextField(
         value = query,
         onValueChange = onQueryChange,

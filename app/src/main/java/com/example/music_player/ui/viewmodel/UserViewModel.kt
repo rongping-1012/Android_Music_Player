@@ -64,7 +64,7 @@ class UserViewModel(
                 } else {
                     musicRepository.getMusicFiles()
                 }
-                musicFiles = files // Store the list for playback
+                musicFiles = files
                 filteredMusicFiles = files
                 _uiState.value = MusicListUiState.Success(files)
             } catch (e: Exception) {

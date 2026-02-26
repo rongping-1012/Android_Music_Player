@@ -29,6 +29,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -140,7 +141,8 @@ fun ProfileScreen(navController: NavController, viewModel: ProfileViewModel, dar
                             if (avatarUri != null) {
                                 AsyncImage(
                                     model = ImageRequest.Builder(context)
-                                        .data(File(avatarUri!!))
+                                        // 直接使用 ViewModel 提供的带时间戳的 URI 字符串
+                                        .data(avatarUri!!)
                                         .crossfade(true)
                                         .build(),
                                     contentDescription = "头像（点击上传）",
@@ -578,6 +580,8 @@ fun EditNicknameDialog(viewModel: ProfileViewModel, onDismiss: () -> Unit) {
 fun ChangePasswordDialog(viewModel: ProfileViewModel, onDismiss: () -> Unit) {
     var oldPassword by remember { mutableStateOf("") }
     var newPassword by remember { mutableStateOf("") }
+    var oldPasswordVisible by remember { mutableStateOf(false) }
+    var newPasswordVisible by remember { mutableStateOf(false) }
     val updateState by viewModel.updatePasswordState.collectAsStateWithLifecycle()
     val context = LocalContext.current
 
@@ -605,9 +609,21 @@ fun ChangePasswordDialog(viewModel: ProfileViewModel, onDismiss: () -> Unit) {
                     value = oldPassword,
                     onValueChange = { oldPassword = it },
                     label = { Text("原密码") },
-                    visualTransformation = PasswordVisualTransformation(),
+                    visualTransformation = if (oldPasswordVisible) {
+                        VisualTransformation.None
+                    } else {
+                        PasswordVisualTransformation()
+                    },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     isError = updateState is UpdateResultState.Error,
+                    trailingIcon = {
+                        IconButton(onClick = { oldPasswordVisible = !oldPasswordVisible }) {
+                            Icon(
+                                imageVector = if (oldPasswordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
+                                contentDescription = if (oldPasswordVisible) "隐藏密码" else "显示密码"
+                            )
+                        }
+                    },
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(8.dp))
@@ -615,9 +631,21 @@ fun ChangePasswordDialog(viewModel: ProfileViewModel, onDismiss: () -> Unit) {
                     value = newPassword,
                     onValueChange = { newPassword = it },
                     label = { Text("新密码") },
-                    visualTransformation = PasswordVisualTransformation(),
+                    visualTransformation = if (newPasswordVisible) {
+                        VisualTransformation.None
+                    } else {
+                        PasswordVisualTransformation()
+                    },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                     isError = updateState is UpdateResultState.Error,
+                    trailingIcon = {
+                        IconButton(onClick = { newPasswordVisible = !newPasswordVisible }) {
+                            Icon(
+                                imageVector = if (newPasswordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
+                                contentDescription = if (newPasswordVisible) "隐藏密码" else "显示密码"
+                            )
+                        }
+                    },
                     modifier = Modifier.fillMaxWidth()
                 )
             }

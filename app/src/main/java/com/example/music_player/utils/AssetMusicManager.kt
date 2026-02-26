@@ -78,14 +78,12 @@ object AssetMusicManager {
                 Log.e(TAG, "无法获取目标目录，复制失败")
                 return@withContext false
             }
-            
             // 检查是否已经复制过
             val flagFile = File(targetDir, ".copied")
             if (flagFile.exists()) {
                 Log.d(TAG, "音乐文件已存在，跳过复制")
                 return@withContext true
             }
-            
             // 获取 assets 中的音乐文件列表
             val assetManager = context.assets
             val musicFiles = try {
@@ -94,12 +92,10 @@ object AssetMusicManager {
                 Log.w(TAG, "assets/music 文件夹不存在或为空", e)
                 return@withContext false
             }
-            
             if (musicFiles.isEmpty()) {
                 Log.w(TAG, "assets/music 文件夹中没有文件")
                 return@withContext false
             }
-            
             Log.d(TAG, "开始复制 ${musicFiles.size} 个音乐文件...")
             
             var successCount = 0

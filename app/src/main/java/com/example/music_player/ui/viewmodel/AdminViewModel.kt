@@ -71,11 +71,9 @@ class AdminViewModel(
                     val dataStoreManager = DataStoreManager(context)
                     dataStoreManager.setSelectedFolderUri(null) // 清除音乐文件夹选择
                 }
-                
-                // Reload the list after deletion
+
                 loadUsers()
             } catch (e: Exception) {
-                // Optionally, handle deletion error
                 _uiState.value = UserListUiState.Error(e.message ?: "删除用户失败")
             }
         }

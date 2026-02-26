@@ -5,6 +5,9 @@ import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -14,6 +17,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.example.music_player.ui.theme.ActiveColor
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -32,18 +36,23 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel) {
 
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var passwordVisible by remember { mutableStateOf(false) }
     var showForgotPasswordDialog by remember { mutableStateOf(false) }
 
-    // Handle side effects of login state changes
+    // 监听 loginState（登录状态）的变化
     LaunchedEffect(loginState) {
         when (val state = loginState) {
             is AuthUiState.Success -> {
-                context.getSharedPreferences("UserPreferences", ComponentActivity.MODE_PRIVATE).edit().putString("currentUsername", username).apply()
+                context.getSharedPreferences(
+                    "UserPreferences", ComponentActivity.MODE_PRIVATE
+                ).edit().putString(
+                    "currentUsername", username
+                ).apply()
                 val route = if (state.isAdmin) Screen.AdminHome.route else Screen.Main.route
                 navController.navigate(route) {
                     popUpTo(Screen.Login.route) { inclusive = true }
                 }
-                viewModel.resetLoginState() // Reset state after navigation
+                viewModel.resetLoginState()
             }
             is AuthUiState.Error -> {
                 Toast.makeText(context, state.message, Toast.LENGTH_SHORT).show()
@@ -101,8 +110,20 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel) {
                     onValueChange = { password = it },
                     label = { Text("密码") },
                     modifier = Modifier.fillMaxWidth(),
-                    visualTransformation = PasswordVisualTransformation(),
+                    visualTransformation = if (passwordVisible) {
+                        VisualTransformation.None
+                    } else {
+                        PasswordVisualTransformation()
+                    },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    trailingIcon = {
+                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                            Icon(
+                                imageVector = if (passwordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
+                                contentDescription = if (passwordVisible) "隐藏密码" else "显示密码"
+                            )
+                        }
+                    },
                     isError = loginState is AuthUiState.Error
                 )
                 Spacer(modifier = Modifier.height(16.dp))
@@ -138,8 +159,8 @@ fun LoginScreen(navController: NavController, viewModel: LoginViewModel) {
 @Composable
 fun ForgotPasswordDialog(viewModel: LoginViewModel, onDismiss: () -> Unit) {
     var username by remember { mutableStateOf("") }
-    var oldPassword by remember { mutableStateOf("") }
     var newPassword by remember { mutableStateOf("") }
+    var newPasswordVisible by remember { mutableStateOf(false) }
     val context = LocalContext.current
     val resetPasswordState by viewModel.resetPasswordState.collectAsStateWithLifecycle()
 
@@ -172,21 +193,23 @@ fun ForgotPasswordDialog(viewModel: LoginViewModel, onDismiss: () -> Unit) {
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(
-                    value = oldPassword,
-                    onValueChange = { oldPassword = it },
-                    label = { Text("请输入旧密码") },
-                    visualTransformation = PasswordVisualTransformation(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    isError = resetPasswordState is AuthUiState.Error,
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                OutlinedTextField(
                     value = newPassword,
                     onValueChange = { newPassword = it },
                     label = { Text("请输入新密码") },
-                    visualTransformation = PasswordVisualTransformation(),
+                    visualTransformation = if (newPasswordVisible) {
+                        VisualTransformation.None
+                    } else {
+                        PasswordVisualTransformation()
+                    },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    trailingIcon = {
+                        IconButton(onClick = { newPasswordVisible = !newPasswordVisible }) {
+                            Icon(
+                                imageVector = if (newPasswordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
+                                contentDescription = if (newPasswordVisible) "隐藏密码" else "显示密码"
+                            )
+                        }
+                    },
                     isError = resetPasswordState is AuthUiState.Error,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -194,9 +217,9 @@ fun ForgotPasswordDialog(viewModel: LoginViewModel, onDismiss: () -> Unit) {
         },
         confirmButton = {
             Button(
-                onClick = { viewModel.resetPassword(username, oldPassword, newPassword) },
+                onClick = { viewModel.resetPassword(username, newPassword) },
                 enabled = resetPasswordState !is AuthUiState.Loading && 
-                    username.isNotBlank() && oldPassword.isNotBlank() && newPassword.isNotBlank()
+                    username.isNotBlank() && newPassword.isNotBlank()
             ) {
                 if (resetPasswordState is AuthUiState.Loading) {
                     CircularProgressIndicator(modifier = Modifier.size(24.dp))

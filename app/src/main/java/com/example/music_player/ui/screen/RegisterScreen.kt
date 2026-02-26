@@ -5,6 +5,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Visibility
+import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -13,6 +16,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import com.example.music_player.ui.theme.ActiveColor
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -27,8 +31,12 @@ fun RegisterScreen(navController: NavController, viewModel: LoginViewModel) {
     var nickname by remember { mutableStateOf("") }
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
+    var passwordVisible by remember { mutableStateOf(false) }
+    var confirmPasswordVisible by remember { mutableStateOf(false) }
     var selectedGender by remember { mutableStateOf<Gender>(Gender.MALE) }
     var usernameError by remember { mutableStateOf<String?>(null) }
+    var passwordError by remember { mutableStateOf<String?>(null) }
     val context = LocalContext.current
     val registerState by viewModel.registerState.collectAsStateWithLifecycle()
     
@@ -42,7 +50,6 @@ fun RegisterScreen(navController: NavController, viewModel: LoginViewModel) {
         return input.filter { it.isLetterOrDigit() || it == '_' }
     }
 
-    // Handle side effects of register state changes
     LaunchedEffect(registerState) {
         when (val state = registerState) {
             is AuthUiState.Success -> {
@@ -152,12 +159,60 @@ fun RegisterScreen(navController: NavController, viewModel: LoginViewModel) {
                 Spacer(modifier = Modifier.height(8.dp))
                 OutlinedTextField(
                     value = password,
-                    onValueChange = { password = it },
+                    onValueChange = {
+                        password = it
+                        passwordError = null
+                    },
                     label = { Text("密码 (至少6位)") },
                     modifier = Modifier.fillMaxWidth(),
-                    visualTransformation = PasswordVisualTransformation(),
+                    visualTransformation = if (passwordVisible) {
+                        VisualTransformation.None
+                    } else {
+                        PasswordVisualTransformation()
+                    },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                    isError = registerState is AuthUiState.Error
+                    trailingIcon = {
+                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                            Icon(
+                                imageVector = if (passwordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
+                                contentDescription = if (passwordVisible) "隐藏密码" else "显示密码"
+                            )
+                        }
+                    },
+                    isError = registerState is AuthUiState.Error || passwordError != null,
+                    supportingText = {
+                        if (passwordError != null) {
+                            Text(
+                                text = passwordError!!,
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        }
+                    }
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = confirmPassword,
+                    onValueChange = {
+                        confirmPassword = it
+                        passwordError = null
+                    },
+                    label = { Text("确认密码") },
+                    modifier = Modifier.fillMaxWidth(),
+                    visualTransformation = if (confirmPasswordVisible) {
+                        VisualTransformation.None
+                    } else {
+                        PasswordVisualTransformation()
+                    },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    trailingIcon = {
+                        IconButton(onClick = { confirmPasswordVisible = !confirmPasswordVisible }) {
+                            Icon(
+                                imageVector = if (confirmPasswordVisible) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
+                                contentDescription = if (confirmPasswordVisible) "隐藏密码" else "显示密码"
+                            )
+                        }
+                    },
+                    isError = passwordError != null
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 
@@ -211,10 +266,25 @@ fun RegisterScreen(navController: NavController, viewModel: LoginViewModel) {
                             return@Button
                         }
                         usernameError = null
+                        // 验证密码长度
+                        if (password.length < 6) {
+                            passwordError = "密码至少需要6位"
+                            return@Button
+                        }
+                        // 验证两次密码是否一致
+                        if (password != confirmPassword) {
+                            passwordError = "两次输入的密码不一致"
+                            return@Button
+                        }
                         viewModel.register(nickname, username, password, selectedGender) 
                     },
                     modifier = Modifier.fillMaxWidth(),
-                    enabled = registerState !is AuthUiState.Loading && username.isNotBlank() && password.isNotBlank() && nickname.isNotBlank() && usernameError == null
+                    enabled = registerState !is AuthUiState.Loading &&
+                        username.isNotBlank() &&
+                        password.isNotBlank() &&
+                        confirmPassword.isNotBlank() &&
+                        nickname.isNotBlank() &&
+                        usernameError == null
                 ) {
                     if (registerState is AuthUiState.Loading) {
                         CircularProgressIndicator(modifier = Modifier.size(24.dp), color = MaterialTheme.colorScheme.onPrimary)
